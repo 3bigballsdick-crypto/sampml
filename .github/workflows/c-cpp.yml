@@ -2,7 +2,6 @@ name: CMake CI
 
 on:
   push:
-    branches: ["main", "master"]
   pull_request:
 
 jobs:
@@ -10,21 +9,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure with CMake
+      - name: Configure
         run: |
-          mkdir build
-          cd build
-          cmake ..
+          cmake -S examples/anti-aimbot/plugin -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: |
-          cd build
-          cmake --build . -- -j$(nproc)
+          cmake --build build --parallel
 
-      - name: (Optional) Run tests
+      - name: Test (if any)
         run: |
-          cd build
-          ctest --output-on-failure || true
+          ctest --test-dir build --output-on-failure || true
